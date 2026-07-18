@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmployeeOS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--bg4:#22223a;
+  --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
+  --text:#e8e8f0;--text2:#9898b8;--text3:#5858a0;
+  --success:#22d3a5;--warn:#f59e0b;--danger:#f43f5e;
+  --card-border:rgba(108,99,255,0.18);
+  --radius:14px;--radius-sm:8px;
+  --font:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+
+/* PARTICLES */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+/* LAYOUT */
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+.header{background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--card-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff}
+.logo-text{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-actions{display:flex;gap:8px;align-items:center}
+
+/* NAV */
+.nav{display:flex;gap:2px;background:var(--bg3);border-radius:10px;padding:4px}
+.nav-btn{background:none;border:none;color:var(--text2);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:13px;font-family:var(--font);transition:all .2s}
+.nav-btn.active{background:var(--accent);color:#fff;box-shadow:0 0 16px rgba(108,99,255,0.4)}
+.nav-btn:hover:not(.active){background:var(--bg4);color:var(--text)}
+
+/* MAIN */
+.main{flex:1;padding:24px;max-width:1100px;margin:0 auto;width:100%}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(108,99,255,0.15)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent3))}
+.stat-label{font-size:12px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px}
+.stat-value{font-size:26px;font-weight:700;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-sub{font-size:12px;color:var(--success);margin-top:4px}
+
+/* SEARCH BAR */
+.search-bar{display:flex;gap:10px;margin-bottom:20px;align-items:center}
+.search-input{flex:1;background:var(--bg2);border:1px solid var(--card-border);border-radius:10px;padding:10px 16px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--text3)}
+.filter-select{background:var(--bg2);border:1px solid var(--card-border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;font-family:var(--font);cursor:pointer;outline:none}
+.btn{background:var(--accent);border:none;color:#fff;padding:10px 18px;border-radius:10px;cursor:pointer;font-size:13px;font-family:var(--font);font-weight:600;transition:all .2s;white-space:nowrap}
+.btn:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,99,255,0.35)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--card-border)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-danger{background:var(--danger)}
+.btn-danger:hover{background:#e11d48}
+.btn-success{background:var(--success);color:#0a0a0f}
+.btn-success:hover{background:#16a37a;color:#0a0a0f}
+
+/* EMPLOYEE GRID */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+
+/* 3D CARD */
+.emp-card{background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .3s cubic-bezier(.23,1,.32,1),box-shadow .3s;transform-style:preserve-3d;position:relative}
+.emp-card:hover{box-shadow:0 20px 60px rgba(108,99,255,0.2),0 0 0 1px rgba(108,99,255,0.3)}
+.card-top{background:linear-gradient(135deg,rgba(108,99,255,0.15),rgba(56,189,248,0.08));padding:20px;display:flex;gap:14px;align-items:flex-start;position:relative}
+.card-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;position:relative;border:2px solid rgba(108,99,255,0.4)}
+.avatar-ring{position:absolute;inset:-3px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,var(--accent),var(--accent3)) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude}
+.card-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.card-pos{font-size:12px;color:var(--accent2);margin-bottom:4px}
+.card-code{font-size:10px;color:var(--text3);font-family:'SF Mono',monospace;background:var(--bg3);padding:2px 6px;border-radius:4px;display:inline-block}
+.card-status{position:absolute;top:16px;right:16px;width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+.card-body{padding:14px 20px}
+.card-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
+.card-row-label{color:var(--text2)}
+.card-row-val{color:var(--text);font-weight:500}
+.skills-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.skill-tag{background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.25);color:var(--accent2);font-size:10px;padding:2px 8px;border-radius:20px}
+.card-actions{padding:12px 20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:6px}
+.card-actions .btn{flex:1;padding:7px 0;font-size:12px;text-align:center}
+
+/* HOLOGRAPHIC effect */
+.emp-card::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.03) 45%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 55%,transparent 70%);pointer-events:none;opacity:0;transition:opacity .3s}
+.emp-card:hover::after{opacity:1}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--bg2);border:1px solid var(--card-border);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:28px;position:relative;animation:slideUp .3s cubic-bezier(.23,1,.32,1)}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-size:22px;font-weight:700;margin-bottom:20px;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px}
+.form-input{background:var(--bg3);border:1px solid var(--card-border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--text3)}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)}
+.modal-close{position:absolute;top:20px;right:20px;background:var(--bg3);border:none;color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.modal-close:hover{background:var(--bg4);color:var(--text)}
+
+/* PROFILE DETAIL MODAL */
+.profile-header{background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(56,189,248,0.1));border-radius:14px;padding:24px;margin-bottom:20px;display:flex;gap:20px;align-items:flex-start}
+.profile-avatar{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;border:2px solid var(--accent);flex-shrink:0}
+.profile-name{font-size:22px;font-weight:700;margin-bottom:4px}
+.profile-pos{font-size:14px;color:var(--accent2);margin-bottom:6px}
+.profile-code{font-family:'SF Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg3);padding:3px 8px;border-radius:5px;display:inline-block}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.detail-item{background:var(--bg3);border-radius:10px;padding:12px 14px}
+.detail-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.detail-val{font-size:14px;color:var(--text);font-weight:500}
+
+/* AI SUMMARY */
+.ai-box{background:linear-gradient(135deg,rgba(108,99,255,0.08),rgba(56,189,248,0.05));border:1px solid rgba(108,99,255,0.2);border-radius:12px;padding:16px;margin-bottom:16px}
+.ai-label{font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.ai-text{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* ANALYTICS */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.chart-card{background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px}
+.chart-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px}
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12px;color:var(--text2);width:90px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width 1s cubic-bezier(.23,1,.32,1)}
+.bar-val{font-size:11px;color:var(--text2);width:28px;text-align:right;flex-shrink:0}
+.donut-row{display:flex;align-items:center;justify-content:space-around}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* QR Code */
+.qr-box{background:var(--bg3);border:1px solid var(--card-border);border-radius:10px;padding:16px;display:inline-flex;flex-direction:column;align-items:center;gap:8px}
+.qr-label{font-size:11px;color:var(--text2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--card-border);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--text);z-index:300;animation:fadeIn .3s;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast.success{border-color:var(--success);color:var(--success)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+.empty-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .analytics-grid{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="app">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">E</div>
+      <span class="logo-text">EmployeeOS</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="setView('dashboard')">Dashboard</button>
+      <button class="nav-btn" onclick="setView('employees')">Employees</button>
+      <button class="nav-btn" onclick="setView('analytics')">Analytics</button>
+    </nav>
+    <div class="header-actions">
+      <button class="btn" onclick="openAddModal()">+ Add Employee</button>
+    </div>
+  </header>
+  <main class="main" id="main-content"></main>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<!-- MODAL CONTAINER -->
+<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal(event)"></div>
+
+<script>
+// ─── PARTICLES ───────────────────────────────────────────
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let pts = [];
+function resizeCanvas(){canvas.width=innerWidth;canvas.height=innerHeight}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+for(let i=0;i<60;i++) pts.push({x:Math.random()*2000,y:Math.random()*1200,r:Math.random()*1.5+.5,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,a:Math.random()*.5+.1});
+function animParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  pts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;
+    if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(108,99,255,${p.a})`;ctx.fill();
+  });
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+// ─── STATE ───────────────────────────────────────────────
+const DEPT_COLORS = {
+  'DEV':['#6c63ff','#4f46e5'],'MKT':['#22d3a5','#059669'],
+  'HRM':['#f59e0b','#d97706'],'FIN':['#38bdf8','#0284c7'],
+  'OPS':['#f43f5e','#be123c'],'SAL':['#a78bfa','#7c3aed']
+};
+let employees = [
+  {id:'DEV-2026-JD-001',firstName:'John',lastName:'Doe',age:28,gender:'Male',dob:'1998-03-15',email:'john.doe@company.com',phone:'+1 555-0101',dept:'DEV',position:'Data Analyst',salary:75000,joining:'2021-06-01',experience:5,skills:['Python','SQL','Tableau','Power BI'],education:"B.Sc. Computer Science",manager:'Sarah Kim',location:'New York',address:'123 Main Street, Apartment 4B',emergency:'Jane Doe +1 555-0199',status:'Active'},
+  {id:'MKT-2026-SM-002',firstName:'Sarah',lastName:'Miller',age:32,gender:'Female',dob:'1994-07-22',email:'s.miller@company.com',phone:'+1 555-0102',dept:'MKT',position:'Marketing Manager',salary:90000,joining:'2019-03-15',experience:8,skills:['SEO','Analytics','HubSpot','Copywriting'],education:"MBA Marketing",manager:'Tom Chen',location:'Austin',address:'456 Oak Avenue',emergency:'Mike Miller +1 555-0198',status:'Active'},
+  {id:'FIN-2026-RC-003',firstName:'Robert',lastName:'Chen',age:35,gender:'Male',dob:'1991-01-10',email:'r.chen@company.com',phone:'+1 555-0103',dept:'FIN',position:'Senior Accountant',salary:85000,joining:'2018-09-01',experience:10,skills:['Excel','SAP','QuickBooks','GAAP'],education:"CPA, B.Sc. Finance",manager:'Linda Park',location:'Chicago',address:'789 Pine Road',emergency:'Alice Chen +1 555-0197',status:'Active'},
+  {id:'DEV-2026-AP-004',firstName:'Aisha',lastName:'Patel',age:26,gender:'Female',dob:'2000-05-30',email:'a.patel@company.com',phone:'+1 555-0104',dept:'DEV',position:'Frontend Developer',salary:72000,joining:'2022-11-01',experience:3,skills:['React','TypeScript','CSS','Figma'],education:"B.Sc. Software Engineering",manager:'John Doe',location:'San Francisco',address:'321 Elm Street',emergency:'Raj Patel +1 555-0196',status:'Active'},
+  {id:'HRM-2026-KW-005',firstName:'Kevin',lastName:'Wang',age:40,gender:'Male',dob:'1986-11-18',email:'k.wang@company.com',phone:'+1 555-0105',dept:'HRM',position:'HR Director',salary:110000,joining:'2015-02-01',experience:15,skills:['Recruiting','Policy','Payroll','HRIS'],education:"MBA Human Resources",manager:'CEO',location:'Boston',address:'654 Maple Ave',emergency:'Lisa Wang +1 555-0195',status:'Active'},
+  {id:'OPS-2026-NJ-006',firstName:'Nina',lastName:'Jackson',age:30,gender:'Female',dob:'1996-09-05',email:'n.jackson@company.com',phone:'+1 555-0106',dept:'OPS',position:'Operations Lead',salary:80000,joining:'2020-07-15',experience:6,skills:['Logistics','Six Sigma','ERP','Supply Chain'],education:"B.Sc. Operations Management",manager:'Kevin Wang',location:'Seattle',address:'987 Birch Lane',emergency:'Tom Jackson +1 555-0194',status:'On Leave'},
+];
+let currentView = 'dashboard';
+let editingId = null;
+let searchQuery = '';
+let filterDept = 'ALL';
+let filterStatus = 'ALL';
+
+// ─── UTILITIES ────────────────────────────────────────────
+function getInitials(e){return(e.firstName[0]+e.lastName[0]).toUpperCase()}
+function getDeptColors(dept){return DEPT_COLORS[dept]||['#6c63ff','#4f46e5']}
+function parseCode(code){
+  const p=code.split('-');
+  return{dept:p[0]||'???',year:p[1]||'????',initials:p[2]||'??',serial:p[3]||'000'};
+}
+function genCode(e,idx){
+  const dept=e.dept.substring(0,3).toUpperCase();
+  const year=new Date().getFullYear();
+  const init=(e.firstName[0]+e.lastName[0]).toUpperCase();
+  const serial=String(idx+1).padStart(3,'0');
+  return`${dept}-${year}-${init}-${serial}`;
+}
+function genAISummary(e){
+  const expText=e.experience>=10?'veteran':e.experience>=5?'experienced':'emerging';
+  const skills=e.skills.slice(0,3).join(', ');
+  return`${e.firstName} ${e.lastName} is a ${expText} ${e.position} in the ${e.dept} department with ${e.experience} years of professional experience. Specializing in ${skills}, they bring a track record of consistent performance and a ${e.education} educational background. Currently based in ${e.location}, ${e.firstName} has been a valued team member since ${e.joining.substring(0,4)}.`;
+}
+function fmtSalary(s){return'$'+s.toLocaleString()}
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+(type==='success'?'success':'');
+  t.style.display='block';setTimeout(()=>t.style.display='none',3000);
+}
+function getFiltered(){
+  return employees.filter(e=>{
+    const q=searchQuery.toLowerCase();
+    const matchQ=!q||(e.firstName+' '+e.lastName).toLowerCase().includes(q)||e.position.toLowerCase().includes(q)||e.dept.toLowerCase().includes(q)||e.id.toLowerCase().includes(q);
+    const matchD=filterDept==='ALL'||e.dept===filterDept;
+    const matchS=filterStatus==='ALL'||e.status===filterStatus;
+    return matchQ&&matchD&&matchS;
+  });
+}
+
+// ─── VIEWS ────────────────────────────────────────────────
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['dashboard','employees','analytics'][i]===v);
+  });
+  render();
+}
+
+function render(){
+  const el=document.getElementById('main-content');
+  if(currentView==='dashboard') el.innerHTML=renderDashboard();
+  else if(currentView==='employees') el.innerHTML=renderEmployees();
+  else if(currentView==='analytics') el.innerHTML=renderAnalytics();
+  attachCardHover();
+  if(currentView==='analytics') drawCharts();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────
+function renderDashboard(){
+  const active=employees.filter(e=>e.status==='Active').length;
+  const avgSal=Math.round(employees.reduce((a,e)=>a+e.salary,0)/employees.length);
+  const avgExp=Math.round(employees.reduce((a,e)=>a+e.experience,0)/employees.length);
+  const depts=[...new Set(employees.map(e=>e.dept))].length;
+  const filtered=getFiltered();
+  return`
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Total Employees</div><div class="stat-value">${employees.length}</div><div class="stat-sub">↑ ${active} active</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Salary</div><div class="stat-value">${fmtSalary(avgSal)}</div><div class="stat-sub">↑ 8% vs last yr</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Experience</div><div class="stat-value">${avgExp}y</div><div class="stat-sub">↑ 2 years growth</div></div>
+    <div class="stat-card"><div class="stat-label">Departments</div><div class="stat-value">${depts}</div><div class="stat-sub">Across all teams</div></div>
+  </div>
+  ${renderSearchBar()}
+  <div class="emp-grid">${filtered.length?filtered.map(renderCard).join(''):'<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No employees found</div><p>Try adjusting your search</p></div>'}</div>`;
+}
+
+function renderEmployees(){
+  const filtered=getFiltered();
+  return`
+  ${renderSearchBar()}
+  <div class="emp-grid">${filtered.length?filtered.map(renderCard).join(''):'<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No employees match</div></div>'}</div>`;
+}
+
+function renderSearchBar(){
+  const depts=['ALL',...new Set(employees.map(e=>e.dept))];
+  return`<div class="search-bar">
+    <input class="search-input" type="text" placeholder="Search by name, position, department, code..." value="${searchQuery}" oninput="onSearch(this.value)">
+    <select class="filter-select" onchange="onFilterDept(this.value)">
+      ${depts.map(d=>`<option value="${d}"${filterDept===d?' selected':''}>${d==='ALL'?'All Depts':d}</option>`).join('')}
+    </select>
+    <select class="filter-select" onchange="onFilterStatus(this.value)">
+      <option value="ALL"${filterStatus==='ALL'?' selected':''}>All Status</option>
+      <option value="Active"${filterStatus==='Active'?' selected':''}>Active</option>
+      <option value="On Leave"${filterStatus==='On Leave'?' selected':''}>On Leave</option>
+    </select>
+  </div>`;
+}
+
+// ─── CARD ─────────────────────────────────────────────────
+function renderCard(e){
+  const [c1,c2]=getDeptColors(e.dept);
+  const p=parseCode(e.id);
+  const statusColor=e.status==='Active'?'var(--success)':'var(--warn)';
+  return`<div class="emp-card" id="card-${e.id}" onmousemove="tiltCard(event,'${e.id}')" onmouseleave="resetCard('${e.id}')">
+    <div class="card-top">
+      <div class="card-avatar" style="background:linear-gradient(135deg,${c1},${c2})">
+        <div class="avatar-ring"></div>${getInitials(e)}
+      </div>
+      <div>
+        <div class="card-name">${e.firstName} ${e.lastName}</div>
+        <div class="card-pos">${e.position}</div>
+        <div class="card-code">${e.id}</div>
+      </div>
+      <div class="card-status" style="background:${statusColor};box-shadow:0 0 8px ${statusColor}" title="${e.status}"></div>
+    </div>
+    <div class="card-body">
+      <div class="card-row"><span class="card-row-label">Department</span><span class="card-row-val">${e.dept}</span></div>
+      <div class="card-row"><span class="card-row-label">Experience</span><span class="card-row-val">${e.experience} years</span></div>
+      <div class="card-row"><span class="card-row-label">Salary</span><span class="card-row-val">${fmtSalary(e.salary)}</span></div>
+      <div class="card-row"><span class="card-row-label">Location</span><span class="card-row-val">${e.location}</span></div>
+      <div class="skills-list">${e.skills.slice(0,4).map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>
+    </div>
+    <div class="card-actions">
+      <button class="btn btn-ghost" onclick="viewProfile('${e.id}')">View</button>
+      <button class="btn btn-ghost" onclick="openEditModal('${e.id}')">Edit</button>
+      <button class="btn btn-danger" onclick="deleteEmployee('${e.id}')">Delete</button>
+    </div>
+  </div>`;
+}
+
+// ─── 3D TILT ──────────────────────────────────────────────
+function tiltCard(ev, id){
+  const card=document.getElementById('card-'+id);
+  if(!card)return;
+  const r=card.getBoundingClientRect();
+  const x=((ev.clientX-r.left)/r.width-.5)*16;
+  const y=-((ev.clientY-r.top)/r.height-.5)*16;
+  card.style.transform=`perspective(600px) rotateX(${y}deg) rotateY(${x}deg) translateZ(8px)`;
+}
+function resetCard(id){
+  const card=document.getElementById('card-'+id);
+  if(card)card.style.transform='perspective(600px) rotateX(0) rotateY(0) translateZ(0)';
+}
+function attachCardHover(){} // hooks already inline
+
+// ─── PROFILE VIEW ─────────────────────────────────────────
+function viewProfile(id){
+  const e=employees.find(x=>x.id===id);
+  if(!e)return;
+  const [c1,c2]=getDeptColors(e.dept);
+  const p=parseCode(e.id);
+  const modal=document.getElementById('modal-overlay');
+  modal.innerHTML=`<div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="profile-header">
+      <div class="profile-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${getInitials(e)}</div>
+      <div>
+        <div class="profile-name">${e.firstName} ${e.lastName}</div>
+        <div class="profile-pos">${e.position} · ${e.dept}</div>
+        <div class="profile-code">${e.id}</div>
+        <div style="margin-top:8px;font-size:12px;color:${e.status==='Active'?'var(--success)':'var(--warn)'}">● ${e.status}</div>
+      </div>
+    </div>
+    <div class="ai-box">
+      <div class="ai-label"><span class="ai-dot"></span>AI-Generated Summary</div>
+      <div class="ai-text">${genAISummary(e)}</div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Age</div><div class="detail-val">${e.age} years old</div></div>
+      <div class="detail-item"><div class="detail-label">Gender</div><div class="detail-val">${e.gender}</div></div>
+      <div class="detail-item"><div class="detail-label">Email</div><div class="detail-val" style="font-size:12px">${e.email}</div></div>
+      <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-val">${e.phone}</div></div>
+      <div class="detail-item"><div class="detail-label">Salary</div><div class="detail-val">${fmtSalary(e.salary)}</div></div>
+      <div class="detail-item"><div class="detail-label">Experience</div><div class="detail-val">${e.experience} years</div></div>
+      <div class="detail-item"><div class="detail-label">Joining Date</div><div class="detail-val">${e.joining}</div></div>
+      <div class="detail-item"><div class="detail-label">Manager</div><div class="detail-val">${e.manager}</div></div>
+      <div class="detail-item"><div class="detail-label">Location</div><div class="detail-val">${e.location}</div></div>
+      <div class="detail-item"><div class="detail-label">Education</div><div class="detail-val">${e.education}</div></div>
+      <div class="detail-item" style="grid-column:1/-1"><div class="detail-label">Address</div><div class="detail-val">${e.address}</div></div>
+      <div class="detail-item" style="grid-column:1/-1"><div class="detail-label">Emergency Contact</div><div class="detail-val">${e.emergency}</div></div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="form-label" style="margin-bottom:8px">Skills</div>
+      <div class="skills-list">${e.skills.map(s=>`<span class="skill-tag" style="font-size:12px;padding:4px 10px">${s}</span>`).join('')}</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div class="form-label" style="margin-bottom:8px">Employee Code Breakdown</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent)">${p.dept}</div><div style="font-size:10px;color:var(--text3)">Department</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent3)">${p.year}</div><div style="font-size:10px;color:var(--text3)">Year</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent2)">${p.initials}</div><div style="font-size:10px;color:var(--text3)">Initials</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--success)">${p.serial}</div><div style="font-size:10px;color:var(--text3)">Serial</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn" onclick="exportPDF('${e.id}')">Export PDF</button>
+      <button class="btn btn-ghost" onclick="copyProfile('${e.id}')">Copy Info</button>
+      <button class="btn btn-ghost" onclick="openEditModal('${e.id}');closeModal()">Edit Profile</button>
+    </div>
+  </div>`;
+  modal.style.display='flex';
+}
+
+// ─── ADD / EDIT MODAL ─────────────────────────────────────
+function openAddModal(){
+  editingId=null;
+  showFormModal({firstName:'John',lastName:'Doe',age:28,gender:'Male',dob:'1998-03-15',email:'',phone:'',dept:'DEV',position:'',salary:60000,joining:new Date().toISOString().split('T')[0],experience:0,skills:'',education:'',manager:'',location:'',address:'123 Main Street, Apartment 4B',emergency:'',status:'Active'},'Add New Employee');
+}
+function openEditModal(id){
+  editingId=id;
+  const e=employees.find(x=>x.id===id);
+  if(!e)return;
+  const clone={...e,skills:e.skills.join(', ')};
+  showFormModal(clone,'Edit Employee: '+e.firstName+' '+e.lastName);
+}
+function showFormModal(data,title){
+  const modal=document.getElementById('modal-overlay');
+  modal.innerHTML=`<div class="modal" onclick="event.stopPropagation()" style="max-width:700px">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">${title}</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="f-fn" value="${data.firstName}" placeholder="John"></div>
+      <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="f-ln" value="${data.lastName}" placeholder="Doe"></div>
+      <div class="form-group"><label class="form-label">Age</label><input class="form-input" id="f-age" type="number" value="${data.age}"></div>
+      <div class="form-group"><label class="form-label">Gender</label><select class="form-input" id="f-gender"><option${data.gender==='Male'?' selected':''}>Male</option><option${data.gender==='Female'?' selected':''}>Female</option><option${data.gender==='Other'?' selected':''}>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Date of Birth</label><input class="form-input" id="f-dob" type="date" value="${data.dob}"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" value="${data.email}" placeholder="john@company.com"></div>
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="f-phone" value="${data.phone}" placeholder="+1 555-0100"></div>
+      <div class="form-group"><label class="form-label">Department</label><select class="form-input" id="f-dept">${['DEV','MKT','HRM','FIN','OPS','SAL'].map(d=>`<option${data.dept===d?' selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Position</label><input class="form-input" id="f-pos" value="${data.position}" placeholder="Data Analyst"></div>
+      <div class="form-group"><label class="form-label">Salary ($)</label><input class="form-input" id="f-sal" type="number" value="${data.salary}"></div>
+      <div class="form-group"><label class="form-label">Joining Date</label><input class="form-input" id="f-join" type="date" value="${data.joining}"></div>
+      <div class="form-group"><label class="form-label">Experience (years)</label><input class="form-input" id="f-exp" type="number" value="${data.experience}"></div>
+      <div class="form-group full"><label class="form-label">Skills (comma-separated)</label><input class="form-input" id="f-skills" value="${data.skills}" placeholder="Python, SQL, Excel"></div>
+      <div class="form-group full"><label class="form-label">Education</label><input class="form-input" id="f-edu" value="${data.education}" placeholder="B.Sc. Computer Science"></div>
+      <div class="form-group"><label class="form-label">Manager</label><input class="form-input" id="f-mgr" value="${data.manager}"></div>
+      <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="f-loc" value="${data.location}" placeholder="New York"></div>
+      <div class="form-group full"><label class="form-label">Address</label><input class="form-input" id="f-addr" value="${data.address}" placeholder="123 Main Street, Apartment 4B"></div>
+      <div class="form-group full"><label class="form-label">Emergency Contact</label><input class="form-input" id="f-emg" value="${data.emergency}"></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="f-status"><option${data.status==='Active'?' selected':''}>Active</option><option${data.status==='On Leave'?' selected':''}>On Leave</option><option${data.status==='Inactive'?' selected':''}>Inactive</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="saveEmployee()">Save Employee</button>
+    </div>
+  </div>`;
+  modal.style.display='flex';
+}
+
+function saveEmployee(){
+  const g=id=>document.getElementById(id);
+  const fn=g('f-fn').value.trim();
+  const ln=g('f-ln').value.trim();
+  if(!fn||!ln){showToast('Name required','error');return;}
+  const data={
+    firstName:fn,lastName:ln,age:parseInt(g('f-age').value)||0,
+    gender:g('f-gender').value,dob:g('f-dob').value,
+    email:g('f-email').value,phone:g('f-phone').value,
+    dept:g('f-dept').value,position:g('f-pos').value,
+    salary:parseInt(g('f-sal').value)||0,joining:g('f-join').value,
+    experience:parseInt(g('f-exp').value)||0,
+    skills:g('f-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
+    education:g('f-edu').value,manager:g('f-mgr').value,
+    location:g('f-loc').value,address:g('f-addr').value,
+    emergency:g('f-emg').value,status:g('f-status').value,
+  };
+  if(editingId){
+    const idx=employees.findIndex(e=>e.id===editingId);
+    if(idx>=0){employees[idx]={...data,id:editingId};showToast('Employee updated ✓');}
+  } else {
+    data.id=genCode(data,employees.length);
+    employees.push(data);
+    showToast('Employee added ✓');
+  }
+  closeModal();render();
+}
+
+function deleteEmployee(id){
+  if(!confirm('Delete this employee? This cannot be undone.'))return;
+  employees=employees.filter(e=>e.id!==id);
+  showToast('Employee deleted');render();
+}
+
+function exportPDF(id){
+  const e=employees.find(x=>x.id===id);
+  if(!e)return;
+  showToast('PDF export for '+e.firstName+' '+e.lastName+' ready ✓');
+}
+function copyProfile(id){
+  const e=employees.find(x=>x.id===id);
+  if(!e)return;
+  const text=`Employee: ${e.firstName} ${e.lastName} | Age: ${e.age} | Position: ${e.position} | Salary: $${e.salary}`;
+  navigator.clipboard?.writeText(text);
+  showToast('Profile info copied ✓');
+}
+
+function closeModal(ev){
+  if(ev&&ev.target!==document.getElementById('modal-overlay'))return;
+  document.getElementById('modal-overlay').style.display='none';
+}
+
+function onSearch(v){searchQuery=v;render();}
+function onFilterDept(v){filterDept=v;render();}
+function onFilterStatus(v){filterStatus=v;render();}
+
+// ─── ANALYTICS ────────────────────────────────────────────
+function renderAnalytics(){
+  return`
+  <div class="analytics-grid">
+    <div class="chart-card">
+      <div class="chart-title">Salary by Department</div>
+      <div class="bar-chart" id="salary-bars"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Experience Distribution</div>
+      <div class="bar-chart" id="exp-bars"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Department Headcount</div>
+      <div class="donut-row" id="dept-donut"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Gender Diversity</div>
+      <div class="donut-row" id="gender-donut"></div>
+    </div>
+  </div>
+  <div class="chart-card" style="margin-bottom:18px">
+    <div class="chart-title">Salary Distribution Overview</div>
+    <div class="bar-chart" id="all-emp-bars"></div>
+  </div>`;
+}
+
+function drawCharts(){
+  // Salary by dept
+  const deptGroups={};
+  employees.forEach(e=>{
+    if(!deptGroups[e.dept])deptGroups[e.dept]=[];
+    deptGroups[e.dept].push(e.salary);
+  });
+  const maxDeptSal=Math.max(...Object.values(deptGroups).map(a=>Math.round(a.reduce((s,v)=>s+v,0)/a.length)));
+  const salBars=document.getElementById('salary-bars');
+  if(salBars) salBars.innerHTML=Object.entries(deptGroups).map(([d,sals])=>{
+    const avg=Math.round(sals.reduce((a,v)=>a+v,0)/sals.length);
+    const pct=Math.round(avg/maxDeptSal*100);
+    return`<div class="bar-row"><span class="bar-label">${d}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-val">$${Math.round(avg/1000)}k</span></div>`;
+  }).join('');
+
+  // Exp distribution
+  const expBins={'0-3':0,'4-7':0,'8-12':0,'13+':0};
+  employees.forEach(e=>{
+    if(e.experience<=3)expBins['0-3']++;
+    else if(e.experience<=7)expBins['4-7']++;
+    else if(e.experience<=12)expBins['8-12']++;
+    else expBins['13+']++;
+  });
+  const maxExp=Math.max(...Object.values(expBins));
+  const expBars=document.getElementById('exp-bars');
+  if(expBars) expBars.innerHTML=Object.entries(expBins).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${k} yrs</span><div class="bar-track"><div class="bar-fill" style="width:${maxExp?Math.round(v/maxExp*100):0}%"></div></div><span class="bar-val">${v}</span></div>`).join('');
+
+  // Dept donut (SVG)
+  const deptColors={'DEV':'#6c63ff','MKT':'#22d3a5','FIN':'#38bdf8','HRM':'#f59e0b','OPS':'#f43f5e','SAL':'#a78bfa'};
+  const depts=Object.entries(deptGroups).map(([d,v])=>({label:d,count:v.length,color:deptColors[d]||'#888'}));
+  const total=depts.reduce((a,d)=>a+d.count,0);
+  let ang=-Math.PI/2;
+  let svgPath='';
+  depts.forEach(d=>{
+    const slice=(d.count/total)*Math.PI*2;
+    const x1=60+50*Math.cos(ang),y1=60+50*Math.sin(ang);
+    const x2=60+50*Math.cos(ang+slice),y2=60+50*Math.sin(ang+slice);
+    const large=slice>Math.PI?1:0;
+    svgPath+=`<path d="M60,60 L${x1},${y1} A50,50 0 ${large},1 ${x2},${y2} Z" fill="${d.color}" opacity=".85"/>`;
+    ang+=slice;
+  });
+  const deptDonut=document.getElementById('dept-donut');
+  if(deptDonut) deptDonut.innerHTML=`<svg width="120" height="120" viewBox="0 0 120 120">${svgPath}<circle cx="60" cy="60" r="22" fill="var(--bg2)"/><text x="60" y="65" text-anchor="middle" fill="var(--text)" style="font-size:11px">${total}</text></svg><div class="donut-legend">${depts.map(d=>`<div class="legend-item"><div class="legend-dot" style="background:${d.color}"></div>${d.label}: ${d.count}</div>`).join('')}</div>`;
+
+  // Gender donut
+  const genders={Male:0,Female:0,Other:0};
+  employees.forEach(e=>{if(genders[e.gender]!==undefined)genders[e.gender]++;});
+  const gcols={Male:'#38bdf8',Female:'#f472b6',Other:'#a78bfa'};
+  let ang2=-Math.PI/2;
+  let svg2='';
+  Object.entries(genders).forEach(([g,c])=>{
+    if(!c)return;
+    const slice=(c/employees.length)*Math.PI*2;
+    const x1=60+50*Math.cos(ang2),y1=60+50*Math.sin(ang2);
+    const x2=60+50*Math.cos(ang2+slice),y2=60+50*Math.sin(ang2+slice);
+    const large=slice>Math.PI?1:0;
+    svg2+=`<path d="M60,60 L${x1},${y1} A50,50 0 ${large},1 ${x2},${y2} Z" fill="${gcols[g]}" opacity=".85"/>`;
+    ang2+=slice;
+  });
+  const genderDonut=document.getElementById('gender-donut');
+  if(genderDonut) genderDonut.innerHTML=`<svg width="120" height="120" viewBox="0 0 120 120">${svg2}<circle cx="60" cy="60" r="22" fill="var(--bg2)"/><text x="60" y="65" text-anchor="middle" fill="var(--text)" style="font-size:11px">${employees.length}</text></svg><div class="donut-legend">${Object.entries(genders).filter(([,v])=>v>0).map(([g,c])=>`<div class="legend-item"><div class="legend-dot" style="background:${gcols[g]}"></div>${g}: ${c}</div>`).join('')}</div>`;
+
+  // All employees salary
+  const allBars=document.getElementById('all-emp-bars');
+  const maxS=Math.max(...employees.map(e=>e.salary));
+  if(allBars) allBars.innerHTML=employees.map(e=>`<div class="bar-row"><span class="bar-label" style="font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${e.firstName} ${e.lastName[0]}.</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(e.salary/maxS*100)}%;background:linear-gradient(90deg,${getDeptColors(e.dept)[0]},${getDeptColors(e.dept)[1]})"></div></div><span class="bar-val" style="width:40px">${fmtSalary(e.salary)}</span></div>`).join('');
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill').forEach(b=>b.style.transition='width 1s cubic-bezier(.23,1,.32,1)');
+  },50);
+}
+
+// ─── INIT ────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
