@@ -143,6 +143,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--card-border);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--text);z-index:300;animation:fadeIn .3s;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
 .toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* EMPTY STATE */
@@ -231,6 +232,7 @@ let editingId = null;
 let searchQuery = '';
 let filterDept = 'ALL';
 let filterStatus = 'ALL';
+let serialCounter = employees.length; // monotonically increasing, never reused even after deletes
 
 // ─── UTILITIES ────────────────────────────────────────────
 function getInitials(e){return(e.firstName[0]+e.lastName[0]).toUpperCase()}
@@ -239,11 +241,11 @@ function parseCode(code){
   const p=code.split('-');
   return{dept:p[0]||'???',year:p[1]||'????',initials:p[2]||'??',serial:p[3]||'000'};
 }
-function genCode(e,idx){
+function genCode(e,serialNum){
   const dept=e.dept.substring(0,3).toUpperCase();
   const year=new Date().getFullYear();
   const init=(e.firstName[0]+e.lastName[0]).toUpperCase();
-  const serial=String(idx+1).padStart(3,'0');
+  const serial=String(serialNum).padStart(3,'0');
   return`${dept}-${year}-${init}-${serial}`;
 }
 function genAISummary(e){
@@ -252,9 +254,14 @@ function genAISummary(e){
   return`${e.firstName} ${e.lastName} is a ${expText} ${e.position} in the ${e.dept} department with ${e.experience} years of professional experience. Specializing in ${skills}, they bring a track record of consistent performance and a ${e.education} educational background. Currently based in ${e.location}, ${e.firstName} has been a valued team member since ${e.joining.substring(0,4)}.`;
 }
 function fmtSalary(s){return'$'+s.toLocaleString()}
+function getStatusColor(status){
+  if(status==='Active')return'var(--success)';
+  if(status==='On Leave')return'var(--warn)';
+  return'var(--danger)'; // Inactive
+}
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast '+(type==='success'?'success':'');
+  t.textContent=msg;t.className='toast '+(type==='error'?'error':type==='success'?'success':'');
   t.style.display='block';setTimeout(()=>t.style.display='none',3000);
 }
 function getFiltered(){
@@ -321,6 +328,7 @@ function renderSearchBar(){
       <option value="ALL"${filterStatus==='ALL'?' selected':''}>All Status</option>
       <option value="Active"${filterStatus==='Active'?' selected':''}>Active</option>
       <option value="On Leave"${filterStatus==='On Leave'?' selected':''}>On Leave</option>
+      <option value="Inactive"${filterStatus==='Inactive'?' selected':''}>Inactive</option>
     </select>
   </div>`;
 }
@@ -329,7 +337,7 @@ function renderSearchBar(){
 function renderCard(e){
   const [c1,c2]=getDeptColors(e.dept);
   const p=parseCode(e.id);
-  const statusColor=e.status==='Active'?'var(--success)':'var(--warn)';
+  const statusColor=getStatusColor(e.status);
   return`<div class="emp-card" id="card-${e.id}" onmousemove="tiltCard(event,'${e.id}')" onmouseleave="resetCard('${e.id}')">
     <div class="card-top">
       <div class="card-avatar" style="background:linear-gradient(135deg,${c1},${c2})">
@@ -387,7 +395,7 @@ function viewProfile(id){
         <div class="profile-name">${e.firstName} ${e.lastName}</div>
         <div class="profile-pos">${e.position} · ${e.dept}</div>
         <div class="profile-code">${e.id}</div>
-        <div style="margin-top:8px;font-size:12px;color:${e.status==='Active'?'var(--success)':'var(--warn)'}">● ${e.status}</div>
+        <div style="margin-top:8px;font-size:12px;color:${getStatusColor(e.status)}">● ${e.status}</div>
       </div>
     </div>
     <div class="ai-box">
@@ -421,10 +429,18 @@ function viewProfile(id){
         <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--success)">${p.serial}</div><div style="font-size:10px;color:var(--text3)">Serial</div></div>
       </div>
     </div>
-    <div style="display:flex;gap:10px">
-      <button class="btn" onclick="exportPDF('${e.id}')">Export PDF</button>
-      <button class="btn btn-ghost" onclick="copyProfile('${e.id}')">Copy Info</button>
-      <button class="btn btn-ghost" onclick="openEditModal('${e.id}');closeModal()">Edit Profile</button>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+      <div class="qr-box">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent('BEGIN:VCARD\nVERSION:3.0\nN:'+e.lastName+';'+e.firstName+'\nTITLE:'+e.position+'\nEMAIL:'+e.email+'\nTEL:'+e.phone+'\nEND:VCARD')}"
+             width="120" height="120" alt="QR code for ${e.firstName} ${e.lastName}'s contact card"
+             onerror="this.replaceWith(Object.assign(document.createElement('div'),{style:'width:120px;height:120px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;color:var(--text3);padding:8px',textContent:'QR code needs an internet connection'}))">
+        <div class="qr-label">Scan for contact card</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1">
+        <button class="btn" onclick="exportPDF('${e.id}')">Export PDF</button>
+        <button class="btn btn-ghost" onclick="copyProfile('${e.id}')">Copy Info</button>
+        <button class="btn btn-ghost" onclick="openEditModal('${e.id}');closeModal()">Edit Profile</button>
+      </div>
     </div>
   </div>`;
   modal.style.display='flex';
@@ -495,9 +511,23 @@ function saveEmployee(){
   };
   if(editingId){
     const idx=employees.findIndex(e=>e.id===editingId);
-    if(idx>=0){employees[idx]={...data,id:editingId};showToast('Employee updated ✓');}
+    if(idx>=0){
+      const prev=employees[idx];
+      let newId=editingId;
+      // If department or name-initials changed, the old code would be misleading — regenerate it,
+      // but keep the original serial number so the employee's numbering stays stable.
+      if(prev.dept!==data.dept||prev.firstName[0]!==data.firstName[0]||prev.lastName[0]!==data.lastName[0]){
+        const p=parseCode(editingId);
+        const dept=data.dept.substring(0,3).toUpperCase();
+        const init=(data.firstName[0]+data.lastName[0]).toUpperCase();
+        newId=`${dept}-${p.year}-${init}-${p.serial}`;
+      }
+      employees[idx]={...data,id:newId};
+      showToast('Employee updated ✓');
+    }
   } else {
-    data.id=genCode(data,employees.length);
+    serialCounter++;
+    data.id=genCode(data,serialCounter);
     employees.push(data);
     showToast('Employee added ✓');
   }
@@ -513,14 +543,65 @@ function deleteEmployee(id){
 function exportPDF(id){
   const e=employees.find(x=>x.id===id);
   if(!e)return;
-  showToast('PDF export for '+e.firstName+' '+e.lastName+' ready ✓');
+  const w=window.open('','_blank');
+  if(!w){showToast('Pop-up blocked — allow pop-ups to export PDF','error');return;}
+  w.document.write(`<!DOCTYPE html><html><head><title>${e.firstName} ${e.lastName} — Employee Profile</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1a1a26;padding:40px;max-width:700px;margin:0 auto}
+    h1{font-size:24px;margin-bottom:4px}
+    .sub{color:#666;margin-bottom:24px}
+    .row{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:8px 0;font-size:14px}
+    .label{color:#666}
+    .val{font-weight:600}
+    .skills span{display:inline-block;background:#eef;border-radius:12px;padding:3px 10px;margin:2px;font-size:12px}
+    .summary{background:#f5f5fa;border-radius:8px;padding:14px;margin:20px 0;font-size:13px;line-height:1.6}
+  </style></head><body>
+  <h1>${e.firstName} ${e.lastName}</h1>
+  <div class="sub">${e.position} · ${e.dept} · ${e.id}</div>
+  <div class="summary">${genAISummary(e)}</div>
+  <div class="row"><span class="label">Status</span><span class="val">${e.status}</span></div>
+  <div class="row"><span class="label">Age</span><span class="val">${e.age}</span></div>
+  <div class="row"><span class="label">Gender</span><span class="val">${e.gender}</span></div>
+  <div class="row"><span class="label">Email</span><span class="val">${e.email}</span></div>
+  <div class="row"><span class="label">Phone</span><span class="val">${e.phone}</span></div>
+  <div class="row"><span class="label">Salary</span><span class="val">${fmtSalary(e.salary)}</span></div>
+  <div class="row"><span class="label">Experience</span><span class="val">${e.experience} years</span></div>
+  <div class="row"><span class="label">Joining Date</span><span class="val">${e.joining}</span></div>
+  <div class="row"><span class="label">Manager</span><span class="val">${e.manager}</span></div>
+  <div class="row"><span class="label">Location</span><span class="val">${e.location}</span></div>
+  <div class="row"><span class="label">Education</span><span class="val">${e.education}</span></div>
+  <div class="row"><span class="label">Address</span><span class="val">${e.address}</span></div>
+  <div class="row"><span class="label">Emergency Contact</span><span class="val">${e.emergency}</span></div>
+  <div class="skills">${e.skills.map(s=>`<span>${s}</span>`).join('')}</div>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`);
+  w.document.close();
+  showToast('Opening print dialog — choose "Save as PDF" ✓');
+}
+function copyToClipboard(text){
+  if(navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text);
+  }
+  // Fallback for non-secure contexts (e.g. opening index.html directly via file://)
+  return new Promise((resolve,reject)=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);
+    ta.focus();ta.select();
+    try{
+      document.execCommand('copy')?resolve():reject(new Error('execCommand failed'));
+    }catch(err){reject(err);}
+    document.body.removeChild(ta);
+  });
 }
 function copyProfile(id){
   const e=employees.find(x=>x.id===id);
   if(!e)return;
   const text=`Employee: ${e.firstName} ${e.lastName} | Age: ${e.age} | Position: ${e.position} | Salary: $${e.salary}`;
-  navigator.clipboard?.writeText(text);
-  showToast('Profile info copied ✓');
+  copyToClipboard(text)
+    .then(()=>showToast('Profile info copied ✓'))
+    .catch(()=>showToast('Copy failed — select and copy manually','error'));
 }
 
 function closeModal(ev){
