@@ -167,7 +167,7 @@ Open `index.html` in a browser and you get a full HR dashboard:
 
 **1. Get the files**
 ```bash
-git clone https://github.com/<your-username>/employee-profile-generator.git
+git clone https://github.com/<codewithrahul18>/employee-profile-generator.git
 cd employee-profile-generator
 ```
 
