@@ -65,11 +65,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
 
 /* 3D CARD */
-.emp-card{background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .3s cubic-bezier(.23,1,.32,1),box-shadow .3s;transform-style:preserve-3d;position:relative}
+.emp-card{background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .3s cubic-bezier(.23,1,.32,1),box-shadow .3s;transform-style:preserve-3d}
 .emp-card:hover{box-shadow:0 20px 60px rgba(108,99,255,0.2),0 0 0 1px rgba(108,99,255,0.3)}
 .card-top{background:linear-gradient(135deg,rgba(108,99,255,0.15),rgba(56,189,248,0.08));padding:20px;display:flex;gap:14px;align-items:flex-start;position:relative}
-.card-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;position:relative;border:2px solid rgba(108,99,255,0.4)}
-.avatar-ring{position:absolute;inset:-3px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,var(--accent),var(--accent3)) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude}
+.card-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;position:relative;border:2px solid rgba(255,255,255,0.1)}
+.avatar-ring{position:absolute;inset:-3px;border-radius:50%;border:2px solid transparent;background:linear-gradient(135deg,var(--accent),var(--accent3)) border-box;-webkit-mask:linear-gradient(#fff 0%,#fff),-webkit-gradient(linear,left top,right bottom,from(#000),to(#fff));-webkit-mask-composite:destination-in;mask-composite:intersect}
 .card-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
 .card-pos{font-size:12px;color:var(--accent2);margin-bottom:4px}
 .card-code{font-size:10px;color:var(--text3);font-family:'SF Mono',monospace;background:var(--bg3);padding:2px 6px;border-radius:4px;display:inline-block}
@@ -84,12 +84,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .card-actions .btn{flex:1;padding:7px 0;font-size:12px;text-align:center}
 
 /* HOLOGRAPHIC effect */
-.emp-card::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.03) 45%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 55%,transparent 70%);pointer-events:none;opacity:0;transition:opacity .3s}
+.emp-card::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.03) 45%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 55%,transparent 70%);opacity:0;transition:opacity .3s}
 .emp-card:hover::after{opacity:1}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:var(--bg2);border:1px solid var(--card-border);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:28px;position:relative;animation:slideUp .3s cubic-bezier(.23,1,.32,1)}
+.modal{background:var(--bg2);border:1px solid var(--card-border);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:28px;position:relative;animation:slideUp .3s ease}
 @keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-title{font-size:22px;font-weight:700;margin-bottom:20px;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -100,7 +100,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .form-input:focus{border-color:var(--accent)}
 .form-input::placeholder{color:var(--text3)}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)}
-.modal-close{position:absolute;top:20px;right:20px;background:var(--bg3);border:none;color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.modal-close{position:absolute;top:20px;right:20px;background:var(--bg3);border:none;color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .modal-close:hover{background:var(--bg4);color:var(--text)}
 
 /* PROFILE DETAIL MODAL */
@@ -141,7 +141,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .qr-label{font-size:11px;color:var(--text2)}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--card-border);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--text);z-index:300;animation:fadeIn .3s;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--card-border);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--text);z-index:300;animation:fadeIn .3s}
 .toast.success{border-color:var(--success);color:var(--success)}
 .toast.error{border-color:var(--danger);color:var(--danger)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -220,19 +220,19 @@ const DEPT_COLORS = {
   'OPS':['#f43f5e','#be123c'],'SAL':['#a78bfa','#7c3aed']
 };
 let employees = [
-  {id:'DEV-2026-JD-001',firstName:'John',lastName:'Doe',age:28,gender:'Male',dob:'1998-03-15',email:'john.doe@company.com',phone:'+1 555-0101',dept:'DEV',position:'Data Analyst',salary:75000,joining:'2021-06-01',experience:5,skills:['Python','SQL','Tableau','Power BI'],education:"B.Sc. Computer Science",manager:'Sarah Kim',location:'New York',address:'123 Main Street, Apartment 4B',emergency:'Jane Doe +1 555-0199',status:'Active'},
-  {id:'MKT-2026-SM-002',firstName:'Sarah',lastName:'Miller',age:32,gender:'Female',dob:'1994-07-22',email:'s.miller@company.com',phone:'+1 555-0102',dept:'MKT',position:'Marketing Manager',salary:90000,joining:'2019-03-15',experience:8,skills:['SEO','Analytics','HubSpot','Copywriting'],education:"MBA Marketing",manager:'Tom Chen',location:'Austin',address:'456 Oak Avenue',emergency:'Mike Miller +1 555-0198',status:'Active'},
-  {id:'FIN-2026-RC-003',firstName:'Robert',lastName:'Chen',age:35,gender:'Male',dob:'1991-01-10',email:'r.chen@company.com',phone:'+1 555-0103',dept:'FIN',position:'Senior Accountant',salary:85000,joining:'2018-09-01',experience:10,skills:['Excel','SAP','QuickBooks','GAAP'],education:"CPA, B.Sc. Finance",manager:'Linda Park',location:'Chicago',address:'789 Pine Road',emergency:'Alice Chen +1 555-0197',status:'Active'},
-  {id:'DEV-2026-AP-004',firstName:'Aisha',lastName:'Patel',age:26,gender:'Female',dob:'2000-05-30',email:'a.patel@company.com',phone:'+1 555-0104',dept:'DEV',position:'Frontend Developer',salary:72000,joining:'2022-11-01',experience:3,skills:['React','TypeScript','CSS','Figma'],education:"B.Sc. Software Engineering",manager:'John Doe',location:'San Francisco',address:'321 Elm Street',emergency:'Raj Patel +1 555-0196',status:'Active'},
-  {id:'HRM-2026-KW-005',firstName:'Kevin',lastName:'Wang',age:40,gender:'Male',dob:'1986-11-18',email:'k.wang@company.com',phone:'+1 555-0105',dept:'HRM',position:'HR Director',salary:110000,joining:'2015-02-01',experience:15,skills:['Recruiting','Policy','Payroll','HRIS'],education:"MBA Human Resources",manager:'CEO',location:'Boston',address:'654 Maple Ave',emergency:'Lisa Wang +1 555-0195',status:'Active'},
-  {id:'OPS-2026-NJ-006',firstName:'Nina',lastName:'Jackson',age:30,gender:'Female',dob:'1996-09-05',email:'n.jackson@company.com',phone:'+1 555-0106',dept:'OPS',position:'Operations Lead',salary:80000,joining:'2020-07-15',experience:6,skills:['Logistics','Six Sigma','ERP','Supply Chain'],education:"B.Sc. Operations Management",manager:'Kevin Wang',location:'Seattle',address:'987 Birch Lane',emergency:'Tom Jackson +1 555-0194',status:'On Leave'},
+  {id:'DEV-2026-JD-001',firstName:'John',lastName:'Doe',age:28,gender:'Male',dob:'1998-03-15',email:'john.doe@company.com',phone:'+1 555-0101',dept:'DEV',position:'Data Analyst',salary:75000,joining:'2021-06-15',experience:3,skills:['Python','SQL','Tableau'],education:'B.Sc. Computer Science',manager:'Alice Johnson',location:'New York',address:'123 Main St, New York, NY 10001',emergency:'Jane Doe (Sister): +1 555-0150',status:'Active'},
+  {id:'MKT-2026-SM-002',firstName:'Sarah',lastName:'Miller',age:32,gender:'Female',dob:'1994-07-22',email:'s.miller@company.com',phone:'+1 555-0102',dept:'MKT',position:'Marketing Manager',salary:82000,joining:'2019-03-10',experience:5,skills:['Digital Marketing','Analytics','Copywriting'],education:'MBA Marketing',manager:'Bob Smith',location:'Chicago',address:'456 Oak Ave, Chicago, IL 60601',emergency:'Tom Miller (Brother): +1 555-0151',status:'Active'},
+  {id:'FIN-2026-RC-003',firstName:'Robert',lastName:'Chen',age:35,gender:'Male',dob:'1991-01-10',email:'r.chen@company.com',phone:'+1 555-0103',dept:'FIN',position:'Senior Accountant',salary:85000,joining:'2016-09-20',experience:8,skills:['Accounting','Auditing','Financial Analysis'],education:'CPA',manager:'Carol White',location:'Boston',address:'789 Pine Rd, Boston, MA 02101',emergency:'Lisa Chen (Sister): +1 555-0152',status:'Active'},
+  {id:'DEV-2026-AP-004',firstName:'Aisha',lastName:'Patel',age:26,gender:'Female',dob:'2000-05-30',email:'a.patel@company.com',phone:'+1 555-0104',dept:'DEV',position:'Frontend Developer',salary:72000,joining:'2022-01-15',experience:2,skills:['React','CSS','JavaScript','TypeScript'],education:'B.Tech IT',manager:'Alice Johnson',location:'San Francisco',address:'321 Elm St, San Francisco, CA 94101',emergency:'Raj Patel (Father): +1 555-0153',status:'Active'},
+  {id:'HRM-2026-KW-005',firstName:'Kevin',lastName:'Wang',age:40,gender:'Male',dob:'1986-11-18',email:'k.wang@company.com',phone:'+1 555-0105',dept:'HRM',position:'HR Director',salary:110000,joining:'2014-05-12',experience:10,skills:['Recruitment','Training','Employee Relations'],education:'MBA HR',manager:'David Brown',location:'Seattle',address:'654 Maple Ln, Seattle, WA 98101',emergency:'Mary Wang (Wife): +1 555-0154',status:'Active'},
+  {id:'OPS-2026-NJ-006',firstName:'Nina',lastName:'Jackson',age:30,gender:'Female',dob:'1996-09-05',email:'n.jackson@company.com',phone:'+1 555-0106',dept:'OPS',position:'Operations Lead',salary:78000,joining:'2020-02-01',experience:4,skills:['Process Management','Logistics','Supply Chain'],education:'B.Sc. Business',manager:'Eve Davis',location:'Austin',address:'987 Cedar Way, Austin, TX 78701',emergency:'Marcus Jackson (Brother): +1 555-0155',status:'Active'}
 ];
 let currentView = 'dashboard';
 let editingId = null;
 let searchQuery = '';
 let filterDept = 'ALL';
 let filterStatus = 'ALL';
-let serialCounter = employees.length; // monotonically increasing, never reused even after deletes
+let serialCounter = employees.length;
 
 // ─── UTILITIES ────────────────────────────────────────────
 function getInitials(e){return(e.firstName[0]+e.lastName[0]).toUpperCase()}
@@ -251,13 +251,13 @@ function genCode(e,serialNum){
 function genAISummary(e){
   const expText=e.experience>=10?'veteran':e.experience>=5?'experienced':'emerging';
   const skills=e.skills.slice(0,3).join(', ');
-  return`${e.firstName} ${e.lastName} is a ${expText} ${e.position} in the ${e.dept} department with ${e.experience} years of professional experience. Specializing in ${skills}, they bring a track record of consistent performance and a ${e.education} educational background. Currently based in ${e.location}, ${e.firstName} has been a valued team member since ${e.joining.substring(0,4)}.`;
+  return`${e.firstName} ${e.lastName} is a ${expText} ${e.position} in the ${e.dept} department with ${e.experience} years of professional experience. Specializing in ${skills}, they bring a track record of excellence and innovation.`;
 }
 function fmtSalary(s){return'$'+s.toLocaleString()}
 function getStatusColor(status){
   if(status==='Active')return'var(--success)';
   if(status==='On Leave')return'var(--warn)';
-  return'var(--danger)'; // Inactive
+  return'var(--danger)';
 }
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
@@ -307,7 +307,8 @@ function renderDashboard(){
     <div class="stat-card"><div class="stat-label">Departments</div><div class="stat-value">${depts}</div><div class="stat-sub">Across all teams</div></div>
   </div>
   ${renderSearchBar()}
-  <div class="emp-grid">${filtered.length?filtered.map(renderCard).join(''):'<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No employees found</div><p>Try adjusting your search</p></div>'}</div>`;
+  <div class="emp-grid">${filtered.length?filtered.map(renderCard).join(''):'<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No employees found</div><p>Try adjusting your search or filters</p></div>'}</div>
+  `;
 }
 
 function renderEmployees(){
@@ -378,7 +379,7 @@ function resetCard(id){
   const card=document.getElementById('card-'+id);
   if(card)card.style.transform='perspective(600px) rotateX(0) rotateY(0) translateZ(0)';
 }
-function attachCardHover(){} // hooks already inline
+function attachCardHover(){}
 
 // ─── PROFILE VIEW ─────────────────────────────────────────
 function viewProfile(id){
@@ -433,7 +434,7 @@ function viewProfile(id){
       <div class="qr-box">
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent('BEGIN:VCARD\nVERSION:3.0\nN:'+e.lastName+';'+e.firstName+'\nTITLE:'+e.position+'\nEMAIL:'+e.email+'\nTEL:'+e.phone+'\nEND:VCARD')}"
              width="120" height="120" alt="QR code for ${e.firstName} ${e.lastName}'s contact card"
-             onerror="this.replaceWith(Object.assign(document.createElement('div'),{style:'width:120px;height:120px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;color:var(--text3);padding:8px',textContent:'QR code needs an internet connection'}))">
+             onerror="this.style.display='none';this.parentNode.appendChild(Object.assign(document.createElement('div'),{textContent:'QR unavailable',style:'width:120px;height:120px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;color:var(--text3)'}))">
         <div class="qr-label">Scan for contact card</div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1">
@@ -449,7 +450,7 @@ function viewProfile(id){
 // ─── ADD / EDIT MODAL ─────────────────────────────────────
 function openAddModal(){
   editingId=null;
-  showFormModal({firstName:'John',lastName:'Doe',age:28,gender:'Male',dob:'1998-03-15',email:'',phone:'',dept:'DEV',position:'',salary:60000,joining:new Date().toISOString().split('T')[0],experience:0,skills:'',education:'',manager:'',location:'',address:'123 Main Street, Apartment 4B',emergency:'',status:'Active'},'Add New Employee');
+  showFormModal({firstName:'John',lastName:'Doe',age:28,gender:'Male',dob:'1998-03-15',email:'',phone:'',dept:'DEV',position:'',salary:60000,joining:new Date().toISOString().split('T')[0],experience:0,skills:'',education:'',manager:'',location:'',address:'',emergency:'',status:'Active'},'Add New Employee');
 }
 function openEditModal(id){
   editingId=id;
@@ -514,8 +515,6 @@ function saveEmployee(){
     if(idx>=0){
       const prev=employees[idx];
       let newId=editingId;
-      // If department or name-initials changed, the old code would be misleading — regenerate it,
-      // but keep the original serial number so the employee's numbering stays stable.
       if(prev.dept!==data.dept||prev.firstName[0]!==data.firstName[0]||prev.lastName[0]!==data.lastName[0]){
         const p=parseCode(editingId);
         const dept=data.dept.substring(0,3).toUpperCase();
@@ -582,7 +581,6 @@ function copyToClipboard(text){
   if(navigator.clipboard && window.isSecureContext){
     return navigator.clipboard.writeText(text);
   }
-  // Fallback for non-secure contexts (e.g. opening index.html directly via file://)
   return new Promise((resolve,reject)=>{
     const ta=document.createElement('textarea');
     ta.value=text;
@@ -682,7 +680,7 @@ function drawCharts(){
     ang+=slice;
   });
   const deptDonut=document.getElementById('dept-donut');
-  if(deptDonut) deptDonut.innerHTML=`<svg width="120" height="120" viewBox="0 0 120 120">${svgPath}<circle cx="60" cy="60" r="22" fill="var(--bg2)"/><text x="60" y="65" text-anchor="middle" fill="var(--text)" style="font-size:11px">${total}</text></svg><div class="donut-legend">${depts.map(d=>`<div class="legend-item"><div class="legend-dot" style="background:${d.color}"></div>${d.label}: ${d.count}</div>`).join('')}</div>`;
+  if(deptDonut) deptDonut.innerHTML=`<svg width="120" height="120" viewBox="0 0 120 120">${svgPath}<circle cx="60" cy="60" r="22" fill="var(--bg2)"/></svg><div class="donut-legend">${depts.map(d=>`<div class="legend-item"><div class="legend-dot" style="background:${d.color}"></div><span>${d.label} (${d.count})</span></div>`).join('')}</div>`;
 
   // Gender donut
   const genders={Male:0,Female:0,Other:0};
@@ -700,12 +698,12 @@ function drawCharts(){
     ang2+=slice;
   });
   const genderDonut=document.getElementById('gender-donut');
-  if(genderDonut) genderDonut.innerHTML=`<svg width="120" height="120" viewBox="0 0 120 120">${svg2}<circle cx="60" cy="60" r="22" fill="var(--bg2)"/><text x="60" y="65" text-anchor="middle" fill="var(--text)" style="font-size:11px">${employees.length}</text></svg><div class="donut-legend">${Object.entries(genders).filter(([,v])=>v>0).map(([g,c])=>`<div class="legend-item"><div class="legend-dot" style="background:${gcols[g]}"></div>${g}: ${c}</div>`).join('')}</div>`;
+  if(genderDonut) genderDonut.innerHTML=`<svg width="120" height="120" viewBox="0 0 120 120">${svg2}<circle cx="60" cy="60" r="22" fill="var(--bg2)"/></svg><div class="donut-legend">${Object.entries(genders).map(([g,c])=>`<div class="legend-item"><div class="legend-dot" style="background:${gcols[g]}"></div><span>${g} (${c})</span></div>`).join('')}</div>`;
 
   // All employees salary
   const allBars=document.getElementById('all-emp-bars');
   const maxS=Math.max(...employees.map(e=>e.salary));
-  if(allBars) allBars.innerHTML=employees.map(e=>`<div class="bar-row"><span class="bar-label" style="font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${e.firstName} ${e.lastName[0]}.</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(e.salary/maxS*100)}%;background:linear-gradient(90deg,${getDeptColors(e.dept)[0]},${getDeptColors(e.dept)[1]})"></div></div><span class="bar-val" style="width:40px">${fmtSalary(e.salary)}</span></div>`).join('');
+  if(allBars) allBars.innerHTML=employees.map(e=>`<div class="bar-row"><span class="bar-label" style="font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${e.firstName} ${e.lastName}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(e.salary/maxS*100)}%"></div></div><span class="bar-val">$${Math.round(e.salary/1000)}k</span></div>`).join('');
   setTimeout(()=>{
     document.querySelectorAll('.bar-fill').forEach(b=>b.style.transition='width 1s cubic-bezier(.23,1,.32,1)');
   },50);
